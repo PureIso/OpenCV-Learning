@@ -5,8 +5,7 @@
 #-------------------------------------------------
 
 QT       += core
-
-QT       -= gui
+#QT       -= gui #remove so we can use QImage
 
 TARGET = display_picture
 CONFIG   += console
@@ -39,3 +38,8 @@ LIBS += -LC:\\opencv\\build\\x86\\mingw\\lib\
 -lopencv_ts2410 \
 -lopencv_video2410 \
 -lopencv_videostab2410 \
+
+OTHER_FILES +=
+
+RESOURCES += \
+    ProjectResources.qrc

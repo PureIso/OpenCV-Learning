@@ -1,59 +1,51 @@
 #include <QCoreApplication>
-#include <QtDebug>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <QImage>                       //QImage
+#include <opencv2/highgui/highgui.hpp>  //Include file for every supported OpenCV function
+#include <opencv2/imgproc/imgproc.hpp>  //CV color members, thresholds etc
 #include <iostream>
-
-void CallBackFunc(int event, int x, int y, int flags, void* userdata)
-{
-     if  ( event == cv::EVENT_LBUTTONDOWN )
-     {
-          std::cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if  ( event == cv::EVENT_RBUTTONDOWN )
-     {
-          std::cout << "Right button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if  ( event == cv::EVENT_MBUTTONDOWN )
-     {
-          std::cout << "Middle button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if ( event == cv::EVENT_MOUSEMOVE )
-     {
-          std::cout << "Mouse move over the window - position (" << x << ", " << y << ")" << std::endl;
-     }
-}
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    cv::Mat frame_1_grey, frame_2_grey, difference;
+    int sensitivityThreshold = 50;
 
-    cv::Mat frame_1 = cv::imread("C:\\Users\\Ola\\Desktop\\860OKMZO\\IMG_0009.jpg");
-    cv::Mat frame_2 = cv::imread("C:\\Users\\Ola\\Desktop\\860OKMZO\\IMG_0010.jpg");
+    //Load Resource Image
+    QImage resourceImage(":/Images/cat.jpg");
+    QImage resourceImage2(":/Images/cat2.jpg");
 
-    cv::Mat frame_1_grey, frame_2_grey;
+    //Convert QImage to Mat
+    cv::Mat frame_1(resourceImage.height(),
+                    resourceImage.width(), CV_8UC4,
+                    const_cast<uchar*>(resourceImage.bits()),
+                    resourceImage.bytesPerLine());
+    cv::Mat frame_2(resourceImage2.height(),
+                    resourceImage2.width(), CV_8UC4,
+                    const_cast<uchar*>(resourceImage2.bits()),
+                    resourceImage2.bytesPerLine());
 
-    cv::Mat difference;
+    //Alternatives
+    //cv::Mat frame_1 = cv::imread("C:\\Users\\Ola\\Desktop\\860OKMZO\\IMG_0009.jpg");
+    //cv::Mat frame_2 = cv::imread("C:\\Users\\Ola\\Desktop\\860OKMZO\\IMG_0010.jpg");
+
     //create GUI windows
     cv::namedWindow("Orignial", cv::WINDOW_NORMAL);
     cv::namedWindow("Second", cv::WINDOW_NORMAL);
     cv::namedWindow("Difference", cv::WINDOW_NORMAL);
 
-    cv::setMouseCallback("Orignial", CallBackFunc, NULL);
-
     // Convert the image to Gray
     cv::cvtColor( frame_1, frame_1_grey, CV_RGB2GRAY);
     cv::cvtColor( frame_2, frame_2_grey, CV_RGB2GRAY);
 
-    cv::resizeWindow("Orignial", 500,500);
-    cv::resizeWindow("Second", 500,500);
-    cv::resizeWindow("Difference", 500,500);
+    //if resize needed optional
+    //cv::resizeWindow("Orignial", 500,500);
+    //cv::resizeWindow("Second", 500,500);
+    //cv::resizeWindow("Difference", 500,500);
 
     // background subtraction
     cv::absdiff(frame_1_grey, frame_2_grey, difference);
-    cv::threshold(difference, difference, 50, 255, CV_THRESH_BINARY); // grayscale needed
+    cv::threshold(difference, difference, sensitivityThreshold, 255, CV_THRESH_BINARY); // grayscale needed
+
     // Show image in window
     cv::imshow("Orignial", frame_1_grey);
     cv::imshow("Second", frame_2_grey);
@@ -65,5 +57,5 @@ int main(int argc, char *argv[])
     //destroy GUI windows
     cv::destroyAllWindows();
 
-    return a.exec();
+    return 0;
 }

@@ -1,13 +1,13 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2014-12-08T19:09:10
+# Project created by QtCreator 2014-12-27T17:09:33
 #
 #-------------------------------------------------
 
 QT       += core
 #QT       -= gui #remove so we can use QImage
 
-TARGET = image_subtraction
+TARGET = edge_detector
 CONFIG   += console
 CONFIG   -= app_bundle
 

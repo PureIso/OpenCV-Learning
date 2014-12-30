@@ -3,60 +3,68 @@
 #include <iostream>
 
 std::vector<cv::Point> points;
-cv::Mat img;
+cv::Mat backgroundImage;
 
-void OnMouseCallback(int event, int x, int y, int flags, void* param)
-{
-     if  ( event == cv::EVENT_LBUTTONDOWN )
-     {
-         std::vector<cv::Point>* ptPtr = (std::vector<cv::Point>*)param;
-         ptPtr->push_back(cv::Point(x,y));
+//Function prototype so I can declare the function after the main
+void OnMouseCallback(int event, int x, int y, int flags, void* param);
 
-         cv::circle(img, cv::Point(x, y), 2, cv::Scalar(255, 255, 255), CV_FILLED, 8, 0);
-         cv::imshow("Orignial", img);
-         std::cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if  ( event == cv::EVENT_RBUTTONDOWN )
-     {
-         //cv::line(img, points[0], cv::Point(x, y), cv::Scalar(0,0,200), 3, 4);
-
-         // create a pointer to the data as an array of points (via a conversion to a Mat() object)
-         const cv::Point *pts = (const cv::Point*) cv::Mat(points).data;
-         int npts = cv::Mat(points).rows;
-         /*
-         cv::polylines(img, &pts,&npts, 1,
-                         true,                  // draw closed contour (i.e. joint end to start)
-                         cv::Scalar(0,255,0),   // colour RGB ordering (here = green)
-                         3,                     // line thickness
-                         CV_AA, 0);
-         */
-         cv::fillPoly(img, &pts, &npts, 1,
-                      cv::Scalar(255,255,255),
-                      8,
-                      0);
-         cv::imshow("Orignial", img);
-         std::cout << "Right button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if  ( event == cv::EVENT_MBUTTONDOWN )
-     {
-          std::cout << "Middle button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
-     }
-     else if ( event == cv::EVENT_MOUSEMOVE )
-     {
-          std::cout << "Mouse move over the window - position (" << x << ", " << y << ")" << std::endl;
-     }
-}
-
-
+//Main Function
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    img = cv::Mat::zeros(cv::Size(200,200), CV_8UC3);
+    //Set a black background
+    backgroundImage = cv::Mat::zeros(cv::Size(500,500), CV_8UC3);
 
     cv::namedWindow("Orignial", cv::WINDOW_NORMAL);
     cv::setMouseCallback("Orignial", OnMouseCallback, (void*)&points);
 
-    cv::imshow("Orignial", img);
+    cv::imshow("Orignial", backgroundImage);
 
-    return a.exec();
+    cv::waitKey(0);
+    return 0;
+}
+
+//Get and Set mouse point in the window
+void OnMouseCallback(int event, int x, int y, int flags, void* param)
+{
+    (void)flags; //unused
+
+    if (event == cv::EVENT_LBUTTONDOWN)
+    {
+        std::vector<cv::Point>* pointPtr = (std::vector<cv::Point>*)param;
+        pointPtr->push_back(cv::Point(x,y));
+
+        //draw a dot on the image
+        cv::circle(backgroundImage, cv::Point(x, y), 2, cv::Scalar(255, 255, 255), CV_FILLED, 8, 0);
+        //display new image
+        cv::imshow("Orignial", backgroundImage);
+        //output coordinate
+        std::cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
+     }
+     else if (event == cv::EVENT_RBUTTONDOWN)
+     {
+        //create a pointer to the data as an array of points (via a conversion to a Mat() object)
+        const cv::Point *allPoints = (const cv::Point*) cv::Mat(points).data;
+        int numberOfPoints = cv::Mat(points).rows;
+
+        //Create line
+        //cv::line(img, points[0], cv::Point(x, y), cv::Scalar(0,0,200), 3, 4);
+
+        /*
+        * Create Polyline
+        cv::polylines(img, &allPoints,&numberOfPoints, 1,
+                     true,                  // draw closed contour (i.e. joint end to start)
+                     cv::Scalar(0,255,0),   // colour RGB ordering (here = green)
+                     3,                     // line thickness
+                     CV_AA, 0);
+        */
+
+        //Create Polyline
+        cv::fillPoly(backgroundImage, &allPoints, &numberOfPoints, 1,
+                  cv::Scalar(255,255,255),
+                  8,
+                  0);
+        cv::imshow("Orignial", backgroundImage);
+        std::cout << "Right button of the mouse is clicked - position (" << x << ", " << y << ")" << std::endl;
+    }
 }

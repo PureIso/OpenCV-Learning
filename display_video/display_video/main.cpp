@@ -1,22 +1,30 @@
 #include <QCoreApplication>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/highgui/highgui.hpp>  //Include file for every supported OpenCV function
+#include <iostream>                     //cout
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    cv::namedWindow( "Example3", cv::WINDOW_NORMAL );
-    cv::VideoCapture cap;
-    cap.open("C:/Users/Ola/Desktop/860OKMZO/VID-20141103-WA0000.mp4");
+    cv::namedWindow("Display Video", cv::WINDOW_NORMAL);
+    cv::VideoCapture videoCapture;
+
+    if (argc <= 1)
+    {
+        std::cout << "No image path specified." << std::endl;
+        return -1;
+    }
+    videoCapture.open(argv[0]);
+
+    //Alternative
+    //videoCapture.open("C:/Users/Ola/Desktop/test.mp4");
+
     cv::Mat frame;
-    while( 1 ) {
-    cap >> frame;
-    if( !frame.data ) break; // Ran out of film
-    cv::imshow( "Example3", frame );
-    if( cv::waitKey(33) >= 0 ) break;
+    while(cv::waitKey(30) == -1)
+    {
+        videoCapture >> frame;
+        if( !frame.data ) break; //Ran out of film
+        cv::imshow("Display Video", frame);
     }
     return 0;
-
-    return a.exec();
 }
